@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane prefHeight="460.0" prefWidth="813.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.nuapps.powerping.PingController">
+    <top>
+        <MenuBar BorderPane.alignment="CENTER">
+            <Menu text="_Arquivo">
+                <MenuItem onAction="#doExit" text="Sai_r">
+                    <accelerator>
+                        <KeyCodeCombination alt="UP" code="Q" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                    </accelerator>
+                </MenuItem>
+            </Menu>
+            <Menu text="_Ferramentas">
+                <MenuItem onAction="#metodoping" text="_Ping">
+                    <accelerator>
+                        <KeyCodeCombination alt="UP" code="G" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                    </accelerator>
+                </MenuItem>
+            </Menu>
+            <Menu text="Aj_uda">
+                <MenuItem text="_Sobre este Aplicativo" />
+            </Menu>
+        </MenuBar>
+    </top>
+    <center>
+        <BorderPane BorderPane.alignment="CENTER">
+            <top>
+                <ToolBar prefHeight="40.0" BorderPane.alignment="CENTER">
+                    <BorderPane.margin>
+                        <Insets />
+                    </BorderPane.margin>
+                    <padding>
+                        <Insets left="12.0" />
+                    </padding>
+                    <Button mnemonicParsing="false" onAction="#metodoping">
+                        <graphic>
+                            <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                                <Image url="@../../../images/ping24.png" />
+                            </ImageView>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="Ping" />
+                        </tooltip></Button>
+                    <CheckBox fx:id="checkBox" mnemonicParsing="false" text="-t" />
+                    <Separator prefWidth="1.0" visible="false" />
+                    <Separator prefWidth="20.0" visible="false" />
+                    <TextField fx:id="txtFiltro" prefWidth="250.0" promptText="Pesquisar" styleClass="txtField" stylesheets="@textfield.css" />
+                    <Button mnemonicParsing="false" onAction="#limpar" style="-fx-background-color: transparent;">
+                        <graphic>
+                            <ImageView pickOnBounds="true" preserveRatio="true">
+                                <Image url="@../../../images/trash16.png" />
+                            </ImageView>
+                        </graphic>
+                        <padding>
+                            <Insets right="5.0" />
+                        </padding>
+                        <tooltip>
+                            <Tooltip text="Limpar" />
+                        </tooltip></Button>
+                    <Button mnemonicParsing="false" onAction="#showDialogoMais">
+                        <tooltip>
+                            <Tooltip text="Filtro avançado" />
+                        </tooltip>
+                        <graphic>
+                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                <Image url="@../../../images/Filter_Plus_16.png"/>
+                            </ImageView>
+                        </graphic></Button>
+                    <Separator prefWidth="30.0" />
+                    <Button disable="true" mnemonicParsing="false" prefWidth="53.0" text="HOME" />
+                </ToolBar>
+            </top>
+            <center>
+                <TableView fx:id="tabela" stylesheets="@tableview.css" BorderPane.alignment="CENTER">
+                    <columns>
+                        <TableColumn fx:id="hostnameCol" prefWidth="166.3999908566475" text="Host Name" />
+                        <TableColumn fx:id="ipaddressCol" prefWidth="168.00001525878906" text="IP Address" />
+                        <TableColumn fx:id="locationCol" prefWidth="600.0" text="Device Location" />
+                    </columns>
+                </TableView>
+            </center>
+        </BorderPane>
+    </center>
+</BorderPane>
