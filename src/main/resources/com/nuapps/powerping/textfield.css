@@ -1,4 +1,5 @@
 .txtField{
-    -fx-base: rgb(77, 208, 225);
+    //-fx-base: rgb(77, 208, 225);
+    -fx-base: rgb(225, 205, 77);
     -fx-background: rgb(225, 228, 203);
 }
