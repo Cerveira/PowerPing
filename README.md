@@ -34,8 +34,3 @@ Microsoft Windows
 
 ![image](https://user-images.githubusercontent.com/20136767/182179878-5e8e1b0c-d3c6-4fe8-80fc-6ee470057209.png)
 
-![image](https://user-images.githubusercontent.com/20136767/179420136-732e8282-20a9-4bc6-a668-4732eb0d60c6.png)
-
-![image](https://user-images.githubusercontent.com/20136767/179420150-a1da1271-b5a3-4caa-925a-abb758180468.png)
-
-
