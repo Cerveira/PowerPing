@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -67,6 +68,21 @@ public class PingController {
         sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(tabela.comparatorProperty());
         tabela.setItems(sortedData);
+
+        // Colunas Host Name e IP Address editáveis
+        hostnameCol.setSortable(false);
+        hostnameCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        hostnameCol.setOnEditCommit(
+                t -> t.getTableView().getItems().get(
+                        t.getTablePosition().getRow()).setHostname(t.getNewValue())
+        );
+
+        ipaddressCol.setSortable(false);
+        ipaddressCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        ipaddressCol.setOnEditCommit(
+                t -> t.getTableView().getItems().get(
+                        t.getTablePosition().getRow()).setIp(t.getNewValue())
+        );
     } // fim do initialize
 
     public void doExit() {
@@ -96,7 +112,7 @@ public class PingController {
         Scene scene = new Scene(page);
 
         Stage dialogStage = new Stage();
-        dialogStage.setTitle("Mostrar linhas que:");
+        dialogStage.setTitle("Show items that:");
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.setScene(scene);
         DialogoMaisController ctrl = loader.getController();
@@ -141,9 +157,9 @@ public class PingController {
                 return host2.getLocation().toLowerCase().contains(lowerCaseFilter);
         };
 
-        if (selectedItem.equals("E")) {
+        if (selectedItem.equals("AND")) {
             filteredData.setPredicate(p1.and(p2));
-        }else if (selectedItem.equals("OU")) {
+        }else if (selectedItem.equals("OR")) {
             filteredData.setPredicate(p1.or(p2));
         }else {
             System.out.println("Erro");

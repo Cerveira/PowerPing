@@ -21,8 +21,10 @@ public class DialogoMaisController {
 
     @FXML
     private void initialize() {
-        comboBox.getItems().add("E");
-        comboBox.getItems().add("OU");
+        //comboBox.getItems().add("E");
+        comboBox.getItems().add("AND");
+        //comboBox.getItems().add("OU");
+        comboBox.getItems().add("OR");
         comboBox.getSelectionModel().select(0);
     }
 

@@ -17,25 +17,25 @@
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane prefHeight="460.0" prefWidth="813.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.nuapps.powerping.PingController">
+<BorderPane prefHeight="460.0" prefWidth="813.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.nuapps.powerping.PingController">
     <top>
         <MenuBar BorderPane.alignment="CENTER">
-            <Menu text="_Arquivo">
-                <MenuItem onAction="#doExit" text="Sai_r">
+            <Menu text="_File">
+                <MenuItem onAction="#doExit" text="E_xit">
                     <accelerator>
                         <KeyCodeCombination alt="UP" code="Q" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                     </accelerator>
                 </MenuItem>
             </Menu>
-            <Menu text="_Ferramentas">
+            <Menu text="_Tools">
                 <MenuItem onAction="#metodoping" text="_Ping">
                     <accelerator>
                         <KeyCodeCombination alt="UP" code="G" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                     </accelerator>
                 </MenuItem>
             </Menu>
-            <Menu text="Aj_uda">
-                <MenuItem text="_Sobre este Aplicativo" />
+            <Menu text="_Help">
+                <MenuItem text="_About" />
             </Menu>
         </MenuBar>
     </top>
@@ -61,7 +61,7 @@
                     <CheckBox fx:id="checkBox" mnemonicParsing="false" text="-t" />
                     <Separator prefWidth="1.0" visible="false" />
                     <Separator prefWidth="20.0" visible="false" />
-                    <TextField fx:id="txtFiltro" prefWidth="250.0" promptText="Pesquisar" styleClass="txtField" stylesheets="@textfield.css" />
+                    <TextField fx:id="txtFiltro" prefWidth="250.0" promptText="type here to search" styleClass="txtField" stylesheets="@textfield.css" />
                     <Button mnemonicParsing="false" onAction="#limpar" style="-fx-background-color: transparent;">
                         <graphic>
                             <ImageView pickOnBounds="true" preserveRatio="true">
@@ -72,23 +72,22 @@
                             <Insets right="5.0" />
                         </padding>
                         <tooltip>
-                            <Tooltip text="Limpar" />
+                            <Tooltip text="Clean" />
                         </tooltip></Button>
                     <Button mnemonicParsing="false" onAction="#showDialogoMais">
                         <tooltip>
-                            <Tooltip text="Filtro avançado" />
+<!--                            <Tooltip text="Filtro avançado" />-->
+                            <Tooltip text="Customize Filter..." />
                         </tooltip>
                         <graphic>
                             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                <Image url="@../../../images/Filter_Plus_16.png"/>
+                                <Image url="@../../../images/Filter_Plus_16.png" />
                             </ImageView>
                         </graphic></Button>
-                    <Separator prefWidth="30.0" />
-                    <Button disable="true" mnemonicParsing="false" prefWidth="53.0" text="HOME" />
                 </ToolBar>
             </top>
             <center>
-                <TableView fx:id="tabela" stylesheets="@tableview.css" BorderPane.alignment="CENTER">
+                <TableView fx:id="tabela" editable="true" stylesheets="@tableview.css" BorderPane.alignment="CENTER">
                     <columns>
                         <TableColumn fx:id="hostnameCol" prefWidth="166.3999908566475" text="Host Name" />
                         <TableColumn fx:id="ipaddressCol" prefWidth="168.00001525878906" text="IP Address" />

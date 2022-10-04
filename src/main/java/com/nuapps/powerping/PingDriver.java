@@ -7,7 +7,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-@SuppressWarnings("deprecation")
 public class PingDriver {
     public void ping(TableView<Host> theTable, String theEco) throws IOException {
         if (theTable.getSelectionModel().getSelectedIndex() >= 0) {
