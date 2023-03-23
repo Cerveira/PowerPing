@@ -56,7 +56,7 @@
                             </ImageView>
                         </graphic>
                         <tooltip>
-                            <Tooltip text="Ping" />
+                            <Tooltip text="Ping (CTRL + G)" />
                         </tooltip></Button>
                     <CheckBox fx:id="checkBox" mnemonicParsing="false" text="-t" />
                     <Separator prefWidth="1.0" visible="false" />
