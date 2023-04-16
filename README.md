@@ -1,6 +1,6 @@
 # Power-Ping
 
-This is a program written in JavaFx that reads data from a Host (IP Address and Host Name) from an Excel spreadsheet (devices.xlsx) and allows performing Ping tests on the selected row(s).
+This is a program written in JavaFx that reads data from a Host (IP Address and Host Name) from an Excel spreadsheet (devices.xlsx) and allows performing Ping tests (ICMP) on the selected row(s).
 
 Step by Step to Compile/Run the application:
 
