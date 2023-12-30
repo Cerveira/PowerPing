@@ -22,29 +22,30 @@ import java.util.function.Predicate;
 public class PingController {
     private static final String ECO_N = "@ping -n 10 ";
     private static final String ECO_T = "@ping -t ";
-    ObservableList<Host> data;
-    SortedList<Host> sortedData;
-    FilteredList<Host> filteredData;
+    ObservableList<Hosts> data;
+    SortedList<Hosts> sortedData;
+    FilteredList<Hosts> filteredData;
 
     @FXML
-    private TableView<Host> tabela;
+    private TableView<Hosts> tabela;
     @FXML
-    private TableColumn<Host, String> hostnameCol;
+    private TableColumn<Hosts, String> hostnameCol;
     @FXML
-    private TableColumn<Host, String> ipaddressCol;
+    private TableColumn<Hosts, String> ipaddressCol;
     @FXML
-    private TableColumn<Host, String> locationCol;
+    private TableColumn<Hosts, String> locationCol;
     @FXML
     private CheckBox checkBox;
     @FXML
     private TextField txtFiltro;
+
     @FXML
     private void initialize() throws IOException {
         hostnameCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getHostname()));
         ipaddressCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getIp()));
         locationCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLocation()));
 
-        Excel excel = new Excel();
+        ExcelReader excel = new ExcelReader();
         data = FXCollections.observableArrayList(excel.hostList);
         tabela.setItems(data);
         tabela.getSelectionModel().selectFirst();
@@ -69,7 +70,7 @@ public class PingController {
         sortedData.comparatorProperty().bind(tabela.comparatorProperty());
         tabela.setItems(sortedData);
 
-        // Colunas Host Name e IP Address editáveis
+        // Colunas Hosts Name e IP Address editáveis
         hostnameCol.setSortable(false);
         hostnameCol.setCellFactory(TextFieldTableCell.forTableColumn());
         hostnameCol.setOnEditCommit(
@@ -86,7 +87,8 @@ public class PingController {
     } // fim do initialize
 
     public void doExit() {
-        Platform.exit(); }
+        Platform.exit();
+    }
 
     @FXML
     private void metodoping() {
@@ -95,19 +97,21 @@ public class PingController {
             PingDriver pingDriver = new PingDriver();
             pingDriver.ping(tabela, eco);
         } catch (IOException ex) {
-            ex.printStackTrace(); }
+            ex.printStackTrace();
+        }
     }
 
     @FXML
     private void limpar() {
         txtFiltro.clear();
-        txtFiltro.requestFocus(); }
+        txtFiltro.requestFocus();
+    }
 
     @FXML
     private void showDialogoMais() throws IOException {
         txtFiltro.clear();
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(PingApplication.class.getResource("DialogoMais.fxml"));
+        loader.setLocation(PingApplication.class.getResource("advancedFilterDialog.fxml"));
         AnchorPane page = loader.load();
         Scene scene = new Scene(page);
 
@@ -115,21 +119,22 @@ public class PingController {
         dialogStage.setTitle("Show items that:");
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.setScene(scene);
-        DialogoMaisController ctrl = loader.getController();
-        ctrl.setDialogStage(dialogStage);
+        AdvancedFilterDialogController ctrl = loader.getController();
+        ctrl.setAdvancedFilterDialogStage(dialogStage);
         dialogStage.setResizable(false);
         dialogStage.showAndWait();
 
         ComboBox cbb;
-        cbb = ctrl.getComboBox();
+        cbb = ctrl.getAndOrComboBox();
 
-        if (ctrl.isOkClicked()) filtrarMais(ctrl.getTf1(), ctrl.getTf2(), cbb.getSelectionModel().getSelectedItem().toString());
+        if (ctrl.isOkClicked())
+            filtrarMais(ctrl.getStringSearchField1(), ctrl.getStringSearchField2(), cbb.getSelectionModel().getSelectedItem().toString());
         if (ctrl.isCancelClicked()) cancelClicked();
     }
 
     @FXML
     private void filtrarMais(String aux1, String aux2, String selectedItem) {
-        Predicate<Host> p1 = host -> {
+        Predicate<Hosts> p1 = host -> {
             if (aux1 == null || aux1.isEmpty()) {
                 return true;
             }
@@ -143,7 +148,7 @@ public class PingController {
                 return host.getLocation().toLowerCase().contains(lowerCaseFilter);
         };
 
-        Predicate<Host> p2 = host2 -> {
+        Predicate<Hosts> p2 = host2 -> {
             if (aux2 == null || aux2.isEmpty()) {
                 return true;
             }
@@ -159,9 +164,9 @@ public class PingController {
 
         if (selectedItem.equals("AND")) {
             filteredData.setPredicate(p1.and(p2));
-        }else if (selectedItem.equals("OR")) {
+        } else if (selectedItem.equals("OR")) {
             filteredData.setPredicate(p1.or(p2));
-        }else {
+        } else {
             System.out.println("Erro");
         }
 
@@ -172,9 +177,10 @@ public class PingController {
 
     @FXML
     private void cancelClicked() {
-        Predicate<Host> predicate = host -> true;
+        Predicate<Hosts> predicate = host -> true;
         filteredData.setPredicate(predicate);
         sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(tabela.comparatorProperty());
-        tabela.setItems(sortedData); }
+        tabela.setItems(sortedData);
+    }
 }

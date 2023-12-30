@@ -9,8 +9,5 @@
         <module name="PowerPing" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="PowerPing" target="17" />
-    </bytecodeTargetLevel>
   </component>
 </project>

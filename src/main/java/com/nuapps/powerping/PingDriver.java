@@ -8,10 +8,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class PingDriver {
-    public void ping(TableView<Host> theTable, String theEco) throws IOException {
+    public void ping(TableView<Hosts> theTable, String theEco) throws IOException {
         if (theTable.getSelectionModel().getSelectedIndex() >= 0) {
-            ObservableList<Host> data = theTable.getSelectionModel().getSelectedItems();
-            for (Host host1: data) {
+            ObservableList<Hosts> data = theTable.getSelectionModel().getSelectedItems();
+            for (Hosts host1: data) {
                 String hostname = host1.getHostname();
                 String ip_address = host1.getIp();
                 int numLinha = data.indexOf(host1);

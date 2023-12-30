@@ -17,7 +17,7 @@
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane prefHeight="460.0" prefWidth="813.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.nuapps.powerping.PingController">
+<BorderPane prefHeight="460.0" prefWidth="813.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.nuapps.powerping.PingController">
     <top>
         <MenuBar BorderPane.alignment="CENTER">
             <Menu text="_File">
@@ -61,7 +61,7 @@
                     <CheckBox fx:id="checkBox" mnemonicParsing="false" text="-t" />
                     <Separator prefWidth="1.0" visible="false" />
                     <Separator prefWidth="20.0" visible="false" />
-                    <TextField fx:id="txtFiltro" prefWidth="250.0" promptText="type here to search" styleClass="txtField" stylesheets="@textfield.css" />
+                    <TextField fx:id="txtFiltro" prefWidth="250.0" promptText="type here to search" stylesheets="@MyTheme.css" />
                     <Button mnemonicParsing="false" onAction="#limpar" style="-fx-background-color: transparent;">
                         <graphic>
                             <ImageView pickOnBounds="true" preserveRatio="true">
@@ -87,7 +87,7 @@
                 </ToolBar>
             </top>
             <center>
-                <TableView fx:id="tabela" editable="true" stylesheets="@tableview.css" BorderPane.alignment="CENTER">
+                <TableView fx:id="tabela" editable="true" stylesheets="@MyTheme.css" BorderPane.alignment="CENTER">
                     <columns>
                         <TableColumn fx:id="hostnameCol" prefWidth="166.3999908566475" text="Host Name" />
                         <TableColumn fx:id="ipaddressCol" prefWidth="168.00001525878906" text="IP Address" />

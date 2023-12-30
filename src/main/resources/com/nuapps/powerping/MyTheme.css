@@ -1,0 +1,8 @@
+.table-view .column-header .label {
+    -fx-alignment: center-left;
+}
+
+.text-field {
+    -fx-base: rgb(225, 205, 77);
+    -fx-background: rgb(225, 228, 203);
+}

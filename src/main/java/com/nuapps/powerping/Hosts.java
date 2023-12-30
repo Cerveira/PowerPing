@@ -1,6 +1,6 @@
 package com.nuapps.powerping;
 
-public class Host {
+public class Hosts {
     String hostname;
     String ip;
     String location;
