@@ -34,8 +34,6 @@ public class AdvancedFilterDialogController {
         return okClicked;
     }
 
-
-
     public boolean isCancelClicked() {
         return cancelClicked;
     }
@@ -83,4 +81,4 @@ public class AdvancedFilterDialogController {
         } else return true;
     }
 }
-// parei aqui
+

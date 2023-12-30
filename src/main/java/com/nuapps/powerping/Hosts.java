@@ -1,31 +1,34 @@
 package com.nuapps.powerping;
 
 public class Hosts {
-    String hostname;
-    String ip;
-    String location;
+    private final String location;
+    private String hostName;
+    private String ipAddress;
 
-    public String getHostname() {
-        return hostname;
+    public Hosts(String hostName, String ipAddress, String location) {
+        this.hostName = hostName;
+        this.ipAddress = ipAddress;
+        this.location = location;
     }
 
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
+    public String getHostName() {
+        return hostName;
     }
 
-    public String getIp() {
-        return ip;
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
     }
 
     public String getLocation() {
         return location;
     }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
 }
+

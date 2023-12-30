@@ -28,14 +28,14 @@
                 </MenuItem>
             </Menu>
             <Menu text="_Tools">
-                <MenuItem onAction="#metodoping" text="_Ping">
+                <MenuItem onAction="#runPing" text="_Ping">
                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="G" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                        <KeyCodeCombination alt="UP" code="P" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                     </accelerator>
                 </MenuItem>
             </Menu>
             <Menu text="_Help">
-                <MenuItem text="_About" />
+                <MenuItem onAction="#showAboutDialog" text="_About" />
             </Menu>
         </MenuBar>
     </top>
@@ -49,23 +49,23 @@
                     <padding>
                         <Insets left="12.0" />
                     </padding>
-                    <Button mnemonicParsing="false" onAction="#metodoping">
+                    <Button mnemonicParsing="false" onAction="#runPing">
                         <graphic>
                             <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                 <Image url="@../../../images/ping24.png" />
                             </ImageView>
                         </graphic>
                         <tooltip>
-                            <Tooltip text="Ping (CTRL + G)" />
+                            <Tooltip text="Ping (Ctrl+P)" />
                         </tooltip></Button>
-                    <CheckBox fx:id="checkBox" mnemonicParsing="false" text="-t" />
+                    <CheckBox fx:id="tCheckBox" mnemonicParsing="false" text="-t" />
                     <Separator prefWidth="1.0" visible="false" />
                     <Separator prefWidth="20.0" visible="false" />
-                    <TextField fx:id="txtFiltro" prefWidth="250.0" promptText="type here to search" stylesheets="@MyTheme.css" />
-                    <Button mnemonicParsing="false" onAction="#limpar" style="-fx-background-color: transparent;">
+                    <TextField fx:id="searchTextField" prefWidth="250.0" promptText="type here to search" stylesheets="@MyTheme.css" />
+                    <Button mnemonicParsing="false" onAction="#clearTextField" style="-fx-background-color: transparent;">
                         <graphic>
                             <ImageView pickOnBounds="true" preserveRatio="true">
-                                <Image url="@../../../images/trash16.png" />
+                                <Image url="@../../../images/button_cancel.png"/>
                             </ImageView>
                         </graphic>
                         <padding>
@@ -74,9 +74,8 @@
                         <tooltip>
                             <Tooltip text="Clean" />
                         </tooltip></Button>
-                    <Button mnemonicParsing="false" onAction="#showDialogoMais">
+                    <Button mnemonicParsing="false" onAction="#showAdvancedFilterDialog">
                         <tooltip>
-<!--                            <Tooltip text="Filtro avançado" />-->
                             <Tooltip text="Customize Filter..." />
                         </tooltip>
                         <graphic>
@@ -87,11 +86,11 @@
                 </ToolBar>
             </top>
             <center>
-                <TableView fx:id="tabela" editable="true" stylesheets="@MyTheme.css" BorderPane.alignment="CENTER">
+                <TableView fx:id="hostTableView" editable="true" stylesheets="@MyTheme.css" BorderPane.alignment="CENTER">
                     <columns>
-                        <TableColumn fx:id="hostnameCol" prefWidth="166.3999908566475" text="Host Name" />
-                        <TableColumn fx:id="ipaddressCol" prefWidth="168.00001525878906" text="IP Address" />
-                        <TableColumn fx:id="locationCol" prefWidth="600.0" text="Device Location" />
+                        <TableColumn fx:id="hostNameTableColumn" prefWidth="166.3999908566475" text="Host Name" />
+                        <TableColumn fx:id="ipAddressTableColumn" prefWidth="168.00001525878906" text="IP Address" />
+                        <TableColumn fx:id="locationTableColumn" prefWidth="600.0" text="Device Location" />
                     </columns>
                 </TableView>
             </center>

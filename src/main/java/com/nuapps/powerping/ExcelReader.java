@@ -1,37 +1,51 @@
 package com.nuapps.powerping;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-import static org.apache.commons.collections4.IteratorUtils.toList;
-
 public class ExcelReader {
-    List<Hosts> hostList = new ArrayList<>();
+    //List<Hosts> hostsList = new ArrayList<>();
+    private final List<Hosts> hostsList = new ArrayList<>();
 
     public ExcelReader() throws IOException {
-        File excel = new File(System.getenv("USERPROFILE") + "/powerping/devices.xlsx");
-        FileInputStream file = new FileInputStream(excel);
-        Workbook workbook = new XSSFWorkbook(file);
-        Sheet sheet = workbook.getSheetAt(0);
-        List<Row> rows = toList(sheet.iterator());
-        rows.remove(0);
+        File file = new File("devices.xlsx");
+        FileInputStream fileInputStream = new FileInputStream(file);
+        Workbook workbook = new XSSFWorkbook(fileInputStream);
 
-        rows.forEach (row -> {
-            List<Cell> cells = toList(row.cellIterator());
-            Hosts host = new Hosts();
-            host.setHostname(cells.get(0).getStringCellValue());
-            host.setIp(cells.get(1).getStringCellValue());
-            host.setLocation(cells.get(2).getStringCellValue());
-            hostList.add(host);
-        });
+        Sheet sheet = workbook.getSheetAt(0);
+        Iterator<Row> rowIterator = sheet.iterator();
+        rowIterator.next(); // Skip header row
+
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            Iterator<Cell> cellIterator = row.cellIterator();
+            Hosts hosts = new Hosts(
+                    getStringCellValue(cellIterator.next()),
+                    getStringCellValue(cellIterator.next()),
+                    getStringCellValue(cellIterator.next())
+            );
+            hostsList.add(hosts);
+        }
+    }
+
+    private String getStringCellValue(Cell cell) {
+        if (cell.getCellType() == CellType.STRING) {
+            return cell.getStringCellValue();
+        } else if (cell.getCellType() == CellType.NUMERIC) {
+            return String.valueOf(cell.getNumericCellValue());
+        } else {
+            return "";
+        }
+    }
+
+    public List<Hosts> getHostsList() {
+        return hostsList;
     }
 }

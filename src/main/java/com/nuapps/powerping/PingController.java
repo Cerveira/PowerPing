@@ -3,6 +3,7 @@ package com.nuapps.powerping;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -16,150 +17,153 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.function.Predicate;
 
-@SuppressWarnings("rawtypes")
 public class PingController {
-    private static final String ECO_N = "@ping -n 10 ";
-    private static final String ECO_T = "@ping -t ";
-    ObservableList<Hosts> data;
-    SortedList<Hosts> sortedData;
-    FilteredList<Hosts> filteredData;
+    private static final String PING_N = "@ping -n 10 ";
+    private static final String PING_T = "@ping -t ";
 
     @FXML
-    private TableView<Hosts> tabela;
+    private TableView<Hosts> hostTableView;
     @FXML
-    private TableColumn<Hosts, String> hostnameCol;
+    private TableColumn<Hosts, String> hostNameTableColumn;
     @FXML
-    private TableColumn<Hosts, String> ipaddressCol;
+    private TableColumn<Hosts, String> ipAddressTableColumn;
     @FXML
-    private TableColumn<Hosts, String> locationCol;
+    private TableColumn<Hosts, String> locationTableColumn;
     @FXML
-    private CheckBox checkBox;
+    private CheckBox tCheckBox;
     @FXML
-    private TextField txtFiltro;
+    private TextField searchTextField;
+
+    private ObservableList<Hosts> dataObservableList;
+    private FilteredList<Hosts> filteredData;
 
     @FXML
-    private void initialize() throws IOException {
-        hostnameCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getHostname()));
-        ipaddressCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getIp()));
-        locationCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLocation()));
+    private void initialize() {
+        setupTableColumns();
+        loadDataObservableList();
+        setupFiltering();
+        setupCellFactories();
+        setupListeners();
+    }
 
-        ExcelReader excel = new ExcelReader();
-        data = FXCollections.observableArrayList(excel.hostList);
-        tabela.setItems(data);
-        tabela.getSelectionModel().selectFirst();
-        tabela.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    private void setupTableColumns() {
+        hostNameTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getHostName()));
+        ipAddressTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getIpAddress()));
+        locationTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLocation()));
+    }
 
-        filteredData = new FilteredList<>(data, b -> true);
-        txtFiltro.textProperty().addListener((observable, oldValue, newValue) -> filteredData.setPredicate(host -> {
+    private void loadDataObservableList() {
+        Path path = Path.of("devices.xlsx");
+
+        if (Files.exists(path)) {
+            try {
+                dataObservableList = FXCollections.observableArrayList(new ExcelReader().getHostsList());
+                hostTableView.setItems(dataObservableList);
+                hostTableView.getSelectionModel().selectFirst();
+                hostTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            } catch (IOException exception) {
+                showErrorDialog("Error loading data", exception.getMessage());
+            }
+        } else {
+            showErrorDialog("File not found", path + " does not exist");
+        }
+    }
+
+    private void setupFiltering() {
+        filteredData = new FilteredList<>(dataObservableList, b -> true);
+        searchTextField.textProperty().addListener((observable, oldValue, newValue) -> filteredData.setPredicate(host -> {
             if (newValue == null || newValue.isEmpty()) {
                 return true;
             }
             String lowerCaseFilter = newValue.toLowerCase();
-
-            if (host.getHostname().toLowerCase().contains(lowerCaseFilter)) {
-                return true;
-            } else if (host.getIp().toLowerCase().contains(lowerCaseFilter)) {
-                return true;
-            } else
-                return host.getLocation().toLowerCase().contains(lowerCaseFilter); // Filter matches last name.
+            return host.getHostName().toLowerCase().contains(lowerCaseFilter)
+                    || host.getIpAddress().toLowerCase().contains(lowerCaseFilter)
+                    || host.getLocation().toLowerCase().contains(lowerCaseFilter);
         }));
+    }
 
-        sortedData = new SortedList<>(filteredData);
-        sortedData.comparatorProperty().bind(tabela.comparatorProperty());
-        tabela.setItems(sortedData);
+    private void setupCellFactories() {
+        hostNameTableColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        hostNameTableColumn.setOnEditCommit(t -> t.getTableView().getItems().get(t.getTablePosition().getRow()).setHostName(t.getNewValue()));
+        ipAddressTableColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        ipAddressTableColumn.setOnEditCommit(t -> t.getTableView().getItems().get(t.getTablePosition().getRow()).setIpAddress(t.getNewValue()));
+    }
 
-        // Colunas Hosts Name e IP Address editáveis
-        hostnameCol.setSortable(false);
-        hostnameCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        hostnameCol.setOnEditCommit(
-                t -> t.getTableView().getItems().get(
-                        t.getTablePosition().getRow()).setHostname(t.getNewValue())
-        );
-
-        ipaddressCol.setSortable(false);
-        ipaddressCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        ipaddressCol.setOnEditCommit(
-                t -> t.getTableView().getItems().get(
-                        t.getTablePosition().getRow()).setIp(t.getNewValue())
-        );
-    } // fim do initialize
+    private void setupListeners() {
+        filteredData.addListener((ListChangeListener<Hosts>) change -> {
+            SortedList<Hosts> sortedData = new SortedList<>(filteredData);
+            sortedData.comparatorProperty().bind(hostTableView.comparatorProperty());
+            hostTableView.setItems(sortedData);
+        });
+    }
 
     public void doExit() {
         Platform.exit();
     }
 
     @FXML
-    private void metodoping() {
+    private void runPing() throws IOException {
+        String strParameters = (tCheckBox.isSelected() ? PING_T : PING_N);
+        PingDriver.ping(hostTableView, strParameters);
+    }
+
+    @FXML
+    private void clearTextField() {
+        searchTextField.clear();
+        searchTextField.requestFocus();
+    }
+
+    @FXML
+    private void showAdvancedFilterDialog() {
         try {
-            String eco = (checkBox.isSelected() ? ECO_T : ECO_N);
-            PingDriver pingDriver = new PingDriver();
-            pingDriver.ping(tabela, eco);
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            searchTextField.clear();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("advancedFilterDialog.fxml"));
+            AnchorPane page = loader.load();
+            Scene scene2 = new Scene(page);
+
+            Stage advancedFilterDialogStage = new Stage();
+            advancedFilterDialogStage.setTitle("Mostrar linhas que:");
+            advancedFilterDialogStage.initModality(Modality.WINDOW_MODAL);
+            advancedFilterDialogStage.setScene(scene2);
+            AdvancedFilterDialogController ctrl = loader.getController();
+            ctrl.setAdvancedFilterDialogStage(advancedFilterDialogStage);
+            advancedFilterDialogStage.setResizable(false);
+            advancedFilterDialogStage.showAndWait();
+
+            if (ctrl.isOkClicked()) {
+                applyFilter(ctrl.getStringSearchField1(), ctrl.getStringSearchField2(),
+                        ctrl.getAndOrComboBox().getSelectionModel().getSelectedItem());
+            }
+            if (ctrl.isCancelClicked()) cancelClicked();
+        } catch (IOException exception) {
+            showErrorDialog("Error", exception.getMessage());
         }
     }
 
     @FXML
-    private void limpar() {
-        txtFiltro.clear();
-        txtFiltro.requestFocus();
-    }
-
-    @FXML
-    private void showDialogoMais() throws IOException {
-        txtFiltro.clear();
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(PingApplication.class.getResource("advancedFilterDialog.fxml"));
-        AnchorPane page = loader.load();
-        Scene scene = new Scene(page);
-
-        Stage dialogStage = new Stage();
-        dialogStage.setTitle("Show items that:");
-        dialogStage.initModality(Modality.WINDOW_MODAL);
-        dialogStage.setScene(scene);
-        AdvancedFilterDialogController ctrl = loader.getController();
-        ctrl.setAdvancedFilterDialogStage(dialogStage);
-        dialogStage.setResizable(false);
-        dialogStage.showAndWait();
-
-        ComboBox cbb;
-        cbb = ctrl.getAndOrComboBox();
-
-        if (ctrl.isOkClicked())
-            filtrarMais(ctrl.getStringSearchField1(), ctrl.getStringSearchField2(), cbb.getSelectionModel().getSelectedItem().toString());
-        if (ctrl.isCancelClicked()) cancelClicked();
-    }
-
-    @FXML
-    private void filtrarMais(String aux1, String aux2, String selectedItem) {
+    private void applyFilter(String aux1, String aux2, String selectedItem) {
         Predicate<Hosts> p1 = host -> {
             if (aux1 == null || aux1.isEmpty()) {
                 return true;
             }
             String lowerCaseFilter = aux1.toLowerCase();
-
-            if (host.getHostname().toLowerCase().contains(lowerCaseFilter)) {
-                return true;
-            } else if (host.getIp().toLowerCase().contains(lowerCaseFilter)) {
-                return true;
-            } else
-                return host.getLocation().toLowerCase().contains(lowerCaseFilter);
+            return host.getHostName().toLowerCase().contains(lowerCaseFilter)
+                    || host.getIpAddress().toLowerCase().contains(lowerCaseFilter)
+                    || host.getLocation().toLowerCase().contains(lowerCaseFilter);
         };
 
-        Predicate<Hosts> p2 = host2 -> {
+        Predicate<Hosts> p2 = host -> {
             if (aux2 == null || aux2.isEmpty()) {
                 return true;
             }
             String lowerCaseFilter = aux2.toLowerCase();
-
-            if (host2.getHostname().toLowerCase().contains(lowerCaseFilter)) {
-                return true;
-            } else if (host2.getIp().toLowerCase().contains(lowerCaseFilter)) {
-                return true;
-            } else
-                return host2.getLocation().toLowerCase().contains(lowerCaseFilter);
+            return host.getHostName().toLowerCase().contains(lowerCaseFilter)
+                    || host.getIpAddress().toLowerCase().contains(lowerCaseFilter)
+                    || host.getLocation().toLowerCase().contains(lowerCaseFilter);
         };
 
         if (selectedItem.equals("AND")) {
@@ -167,20 +171,44 @@ public class PingController {
         } else if (selectedItem.equals("OR")) {
             filteredData.setPredicate(p1.or(p2));
         } else {
-            System.out.println("Erro");
+            showErrorDialog("Error", "Invalid selection");
         }
-
-        sortedData = new SortedList<>(filteredData);
-        sortedData.comparatorProperty().bind(tabela.comparatorProperty());
-        tabela.setItems(sortedData);
     }
 
     @FXML
     private void cancelClicked() {
         Predicate<Hosts> predicate = host -> true;
         filteredData.setPredicate(predicate);
-        sortedData = new SortedList<>(filteredData);
-        sortedData.comparatorProperty().bind(tabela.comparatorProperty());
-        tabela.setItems(sortedData);
+    }
+
+    @FXML
+    private void showAboutDialog() {
+        try {
+            // Carrega o arquivo FXML do diálogo "About"
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("aboutDialog.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            // Cria um novo palco (Stage) para o diálogo
+            Stage aboutStage = new Stage();
+            aboutStage.setTitle("About PowerPing");
+            aboutStage.initModality(Modality.WINDOW_MODAL);
+
+            // Define a cena no palco do diálogo
+            aboutStage.setScene(scene);
+
+            aboutStage.setResizable(false);
+            aboutStage.showAndWait();
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    private void showErrorDialog(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
+

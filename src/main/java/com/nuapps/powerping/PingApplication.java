@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class PingApplication extends Application {
+    public static void main(String[] args) {
+        launch();
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/ivp_icon.png"))));
@@ -26,9 +30,5 @@ public class PingApplication extends Application {
         stage.setTitle("PowerPing");
         stage.setScene(scene);
         stage.show();
-    }
-
-    public static void main(String[] args) {
-        launch();
     }
 }
