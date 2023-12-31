@@ -1,38 +1,42 @@
-# Power-Ping
+# PowerPing 
+[![NPM](https://img.shields.io/npm/l/react)](https://github.com/Cerveira/Power-Ping/blob/master/LICENSE) 
 
-This is a program written in JavaFx that reads data from a Host (IP Address and Host Name) from an Excel spreadsheet (devices.xlsx) and allows performing Ping tests (ICMP) on the selected row(s).
+## Descrição
+O PowerPing é um aplicativo desktop escrito em Java/JavaFX que oferece uma maneira fácil e intuitiva de realizar testes de "ping" (ICMP) em hosts selecionados. Com uma interface gráfica amigável, o PowerPing simplifica o processo de monitoramento da conectividade de dispositivos em uma rede.
 
-Step by Step to Compile/Run the application:
+## Características Principais
+**Tecnologia JavaFX:** Desenvolvido utilizando JavaFX, o PowerPing oferece uma experiência de usuário moderna e responsiva.
 
- - You must create a folder called "powerping" in your personal folder and in it insert the Excel spreadsheet: "devices.xlsx".
+**Versão Java:** O PowerPing utiliza a versão "17.0.8" OpenJDK da BellSoft Liberica, que inclui o suporte ao JavaFX.
 
-   WIN + R -> %userprofile%
+**IDE Utilizada:** O código-fonte do PowerPing foi desenvolvido no IntelliJ IDEA 2023.3.2 (Community Edition), garantindo uma experiência de desenvolvimento eficiente e integrada.
 
-   Right click on an empty area, choose New – Folder and rename to powerping. Create in this folder the devices.xlsx worksheet as shown below.
+**Leitura de Dados a partir de Planilha Excel:** O PowerPing simplifica o processo de entrada de dados ao permitir a leitura direta de uma planilha Excel. Esta planilha contém os detalhes dos hosts, incluindo endereço IP e nome do host.
 
-Programming language used:
+**Sistema Operacional Suportado:** O PowerPing foi projetado para funcionar de forma otimizada no sistema operacional Microsoft Windows.
 
-JavaFX
+## Requisitos do Sistema
+**Sistema Operacional:** Microsoft Windows
 
-IDE used:
+**Versão Java:** OpenJDK 17.0.8 (Incluindo JavaFX)
 
-IntelliJ IDEA 2022.1.2
-
-Java Version:
-
-18.0.1.1
-
-JavaFX Version:
-
-javafx-sdk-18.0.1
-
-Supported Operating System:
-
-Microsoft Windows
-
-![image](https://user-images.githubusercontent.com/20136767/182179793-0be035c8-4ec4-4bee-b60c-e082ce6b5fa7.png)
-
-![image](https://user-images.githubusercontent.com/20136767/185515601-c17f19c4-ba90-42bb-a7f3-fb3fa92d2d8d.png)
+**IDE:** IntelliJ IDEA 2023.3.2 (Community Edition)
 
 
+## Instruções de Uso
+1. **Clone o Repositório:** Faça o clone do repositório para o seu ambiente local.
 
+   git clone https://github.com/Cerveira/Power-Ping.git
+2. **Importe o Projeto:** Abra o projeto no IntelliJ IDEA.
+3. **Configure as Dependências:** Certifique-se de ter as dependências corretas configuradas, incluindo o JavaFX.
+4. **Compile e Execute:** Compile e execute o aplicativo a partir do IntelliJ IDEA.
+5. **Realize os Testes de Ping:** Selecione os hosts desejados na tabela e inicie os testes de "ping" para monitorar a conectividade.
+
+## Contribuições
+Contribuições são bem-vindas! Se você identificar problemas ou tiver sugestões para melhorias, sinta-se à vontade para abrir uma issue ou enviar um pull request.
+
+## Autor
+
+Ivaldo Lima Cerveira
+
+www.linkedin.com/in/ivaldo-cerveira-710b1444
