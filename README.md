@@ -35,6 +35,13 @@ O PowerPing é um aplicativo desktop escrito em Java/JavaFX que oferece uma mane
 ## Contribuições
 Contribuições são bem-vindas! Se você identificar problemas ou tiver sugestões para melhorias, sinta-se à vontade para abrir uma issue ou enviar um pull request.
 
+## Imagens do Aplicativo
+![Imagem_aplicativo](https://github.com/Cerveira/assets/blob/main/Imagem_aplicativo.png)
+
+![Imagem_planilha](https://github.com/Cerveira/assets/blob/main/Imagem_planilha.png)
+
+![Imagem_tela_ping](https://github.com/Cerveira/assets/blob/main/Imagem_tela_ping.png)
+
 ## Autor
 
 Ivaldo Lima Cerveira
