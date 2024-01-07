@@ -7,7 +7,8 @@ O PowerPing é um aplicativo desktop escrito em Java/JavaFX que oferece uma mane
 ## Características Principais
 **Tecnologia JavaFX:** Desenvolvido utilizando JavaFX, o PowerPing oferece uma experiência de usuário moderna e responsiva.
 
-**Versão Java:** O PowerPing utiliza a versão "17.0.8" OpenJDK da BellSoft Liberica, que inclui o suporte ao JavaFX.
+**Versão Java:** O PowerPing utiliza a versão "17.0.8" OpenJDK da BellSoft Liberica, que inclui o suporte ao JavaFX.  
+https://bell-sw.com/pages/downloads/#jdk-17-lts
 
 **IDE Utilizada:** O código-fonte do PowerPing foi desenvolvido no IntelliJ IDEA 2023.3.2 (Community Edition), garantindo uma experiência de desenvolvimento eficiente e integrada.
 
