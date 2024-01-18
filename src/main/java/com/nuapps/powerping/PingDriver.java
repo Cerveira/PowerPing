@@ -1,5 +1,6 @@
 package com.nuapps.powerping;
 
+import com.nuapps.powerping.model.RowData;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableView;
 
@@ -7,11 +8,11 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class PingDriver {
-    public static void ping(TableView<Hosts> theTable, String strParameters) throws IOException {
+public class PingDriver { // mover este metodo para a classe PingController
+    public static void ping(TableView<RowData> theTable, String strParameters) throws IOException {
         if (theTable.getSelectionModel().getSelectedIndex() >= 0) {
-            ObservableList<Hosts> data = theTable.getSelectionModel().getSelectedItems();
-            for (Hosts hosts1 : data) {
+            ObservableList<RowData> data = theTable.getSelectionModel().getSelectedItems();
+            for (RowData hosts1 : data) {
                 String strCommand;
                 String hostName = hosts1.getHostName();
                 strCommand = strParameters + hosts1.getIpAddress();
@@ -33,10 +34,10 @@ public class PingDriver {
                     bf.newLine();
                     bf.write("@pause");
                 }
+
                 String strCommand2 = env_temp + "/powerping/ping" + lineNumber + ".bat";
                 Runtime.getRuntime().exec("rundll32 SHELL32.DLL,ShellExec_RunDLL " + strCommand2);
             }
         }
     }
 }
-// parei aqui

@@ -1,5 +1,8 @@
+// deletada a classe ExcelReader - TESTAR
+
 package com.nuapps.powerping;
 
+import com.nuapps.powerping.model.RowData;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -15,10 +18,17 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Iterator;
 import java.util.function.Predicate;
 
 public class PingController {
@@ -26,25 +36,27 @@ public class PingController {
     private static final String PING_T = "@ping -t ";
 
     @FXML
-    private TableView<Hosts> hostTableView;
+    private TableView<RowData> hostTableView;
     @FXML
-    private TableColumn<Hosts, String> hostNameTableColumn;
+    private TableColumn<RowData, String> hostNameTableColumn;
     @FXML
-    private TableColumn<Hosts, String> ipAddressTableColumn;
+    private TableColumn<RowData, String> ipAddressTableColumn;
     @FXML
-    private TableColumn<Hosts, String> locationTableColumn;
+    private TableColumn<RowData, String> locationTableColumn;
     @FXML
     private CheckBox tCheckBox;
     @FXML
     private TextField searchTextField;
 
-    private ObservableList<Hosts> dataObservableList;
-    private FilteredList<Hosts> filteredData;
+    //private ObservableList<RowData> dataObservableList;
+    private final ObservableList<RowData> rowDataList = FXCollections.observableArrayList();
+    private FilteredList<RowData> filteredData;
 
     @FXML
     private void initialize() {
         setupTableColumns();
-        loadDataObservableList();
+        //loadDataObservableList();
+        loadExcelData();
         setupFiltering();
         setupCellFactories();
         setupListeners();
@@ -56,7 +68,38 @@ public class PingController {
         locationTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLocation()));
     }
 
-    private void loadDataObservableList() {
+    private void loadExcelData() {
+        try {
+            FileInputStream file = new FileInputStream("devices.xlsx");
+            Workbook workbook = WorkbookFactory.create(file);
+            Sheet sheet = workbook.getSheetAt(0); // Assumindo que os dados estão na primeira planilha
+
+            Iterator<Row> rowIterator = sheet.iterator();
+            rowIterator.next();
+
+            while (rowIterator.hasNext()) {
+                Row row = rowIterator.next();
+
+                // Lendo os dados da planilha e adicionando à lista
+                String col1Value = row.getCell(0).getStringCellValue();
+                String col2Value = row.getCell(1).getStringCellValue();
+                String col3Value = row.getCell(2).getStringCellValue();
+
+                rowDataList.add(new RowData(col1Value, col2Value, col3Value));
+                hostTableView.setItems(rowDataList);
+                hostTableView.getSelectionModel().selectFirst();
+                hostTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            }
+            file.close();
+        } catch (FileNotFoundException e) {
+            //showErrorDialog("File not found", "devices.xlsx does not exist");
+            showErrorDialog("File not found", Path.of("devices.xlsx") + " does not exist");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /*private void loadDataObservableList() {
         Path path = Path.of("devices.xlsx");
 
         if (Files.exists(path)) {
@@ -71,10 +114,10 @@ public class PingController {
         } else {
             showErrorDialog("File not found", path + " does not exist");
         }
-    }
+    }*/
 
     private void setupFiltering() {
-        filteredData = new FilteredList<>(dataObservableList, b -> true);
+        filteredData = new FilteredList<>(rowDataList, b -> true);
         searchTextField.textProperty().addListener((observable, oldValue, newValue) -> filteredData.setPredicate(host -> {
             if (newValue == null || newValue.isEmpty()) {
                 return true;
@@ -94,8 +137,8 @@ public class PingController {
     }
 
     private void setupListeners() {
-        filteredData.addListener((ListChangeListener<Hosts>) change -> {
-            SortedList<Hosts> sortedData = new SortedList<>(filteredData);
+        filteredData.addListener((ListChangeListener<RowData>) change -> {
+            SortedList<RowData> sortedData = new SortedList<>(filteredData);
             sortedData.comparatorProperty().bind(hostTableView.comparatorProperty());
             hostTableView.setItems(sortedData);
         });
@@ -146,7 +189,7 @@ public class PingController {
 
     @FXML
     private void applyFilter(String aux1, String aux2, String selectedItem) {
-        Predicate<Hosts> p1 = host -> {
+        Predicate<RowData> p1 = host -> {
             if (aux1 == null || aux1.isEmpty()) {
                 return true;
             }
@@ -156,7 +199,7 @@ public class PingController {
                     || host.getLocation().toLowerCase().contains(lowerCaseFilter);
         };
 
-        Predicate<Hosts> p2 = host -> {
+        Predicate<RowData> p2 = host -> {
             if (aux2 == null || aux2.isEmpty()) {
                 return true;
             }
@@ -177,7 +220,7 @@ public class PingController {
 
     @FXML
     private void cancelClicked() {
-        Predicate<Hosts> predicate = host -> true;
+        Predicate<RowData> predicate = host -> true;
         filteredData.setPredicate(predicate);
     }
 

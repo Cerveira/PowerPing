@@ -1,12 +1,12 @@
-/*
-package com.nuapps.powerping;
+package com.nuapps.powerping.model;
 
-public class Hosts {
-    private final String location;
+// Classe de modelo para representar uma linha de dados
+public class RowData {
     private String hostName;
     private String ipAddress;
+    private final String location;
 
-    public Hosts(String hostName, String ipAddress, String location) {
+    public RowData(String hostName, String ipAddress, String location) {
         this.hostName = hostName;
         this.ipAddress = ipAddress;
         this.location = location;
@@ -32,5 +32,3 @@ public class Hosts {
         return location;
     }
 }
-
-*/
