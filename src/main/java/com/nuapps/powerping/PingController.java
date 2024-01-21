@@ -1,5 +1,3 @@
-// deletada a classe ExcelReader - TESTAR
-
 package com.nuapps.powerping;
 
 import com.nuapps.powerping.model.RowData;
@@ -23,10 +21,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Files;
+import java.io.*;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.function.Predicate;
@@ -34,9 +29,9 @@ import java.util.function.Predicate;
 public class PingController {
     private static final String PING_N = "@ping -n 10 ";
     private static final String PING_T = "@ping -t ";
-
+    private final ObservableList<RowData> rowDataList = FXCollections.observableArrayList();
     @FXML
-    private TableView<RowData> hostTableView;
+    private TableView<RowData> tableView;
     @FXML
     private TableColumn<RowData, String> hostNameTableColumn;
     @FXML
@@ -47,15 +42,11 @@ public class PingController {
     private CheckBox tCheckBox;
     @FXML
     private TextField searchTextField;
-
-    //private ObservableList<RowData> dataObservableList;
-    private final ObservableList<RowData> rowDataList = FXCollections.observableArrayList();
     private FilteredList<RowData> filteredData;
 
     @FXML
     private void initialize() {
         setupTableColumns();
-        //loadDataObservableList();
         loadExcelData();
         setupFiltering();
         setupCellFactories();
@@ -84,37 +75,18 @@ public class PingController {
                 String col1Value = row.getCell(0).getStringCellValue();
                 String col2Value = row.getCell(1).getStringCellValue();
                 String col3Value = row.getCell(2).getStringCellValue();
-
                 rowDataList.add(new RowData(col1Value, col2Value, col3Value));
-                hostTableView.setItems(rowDataList);
-                hostTableView.getSelectionModel().selectFirst();
-                hostTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+                tableView.setItems(rowDataList);
+                tableView.getSelectionModel().selectFirst();
+                tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
             }
             file.close();
         } catch (FileNotFoundException e) {
-            //showErrorDialog("File not found", "devices.xlsx does not exist");
             showErrorDialog("File not found", Path.of("devices.xlsx") + " does not exist");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
-    /*private void loadDataObservableList() {
-        Path path = Path.of("devices.xlsx");
-
-        if (Files.exists(path)) {
-            try {
-                dataObservableList = FXCollections.observableArrayList(new ExcelReader().getHostsList());
-                hostTableView.setItems(dataObservableList);
-                hostTableView.getSelectionModel().selectFirst();
-                hostTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            } catch (IOException exception) {
-                showErrorDialog("Error loading data", exception.getMessage());
-            }
-        } else {
-            showErrorDialog("File not found", path + " does not exist");
-        }
-    }*/
 
     private void setupFiltering() {
         filteredData = new FilteredList<>(rowDataList, b -> true);
@@ -139,8 +111,8 @@ public class PingController {
     private void setupListeners() {
         filteredData.addListener((ListChangeListener<RowData>) change -> {
             SortedList<RowData> sortedData = new SortedList<>(filteredData);
-            sortedData.comparatorProperty().bind(hostTableView.comparatorProperty());
-            hostTableView.setItems(sortedData);
+            sortedData.comparatorProperty().bind(tableView.comparatorProperty());
+            tableView.setItems(sortedData);
         });
     }
 
@@ -149,9 +121,42 @@ public class PingController {
     }
 
     @FXML
-    private void runPing() throws IOException {
-        String strParameters = (tCheckBox.isSelected() ? PING_T : PING_N);
-        PingDriver.ping(hostTableView, strParameters);
+    private void runPing() {
+        if (tableView.getSelectionModel().getSelectedIndex() >= 0) {
+            ObservableList<RowData> data = tableView.getSelectionModel().getSelectedItems();
+            try {
+                for (RowData rowData : data) {
+                    String hostName = rowData.getHostName();
+                    String pingCommand = (tCheckBox.isSelected() ? PING_T : PING_N) + rowData.getIpAddress();
+                    String ipAddress = rowData.getIpAddress();
+                    int lineNumber = data.indexOf(rowData);
+
+                    String env_temp = System.getenv("TEMP");
+                    String batFileName = env_temp + "/powerping/ping" + lineNumber + ".bat";
+                    FileWriter bat = new FileWriter(batFileName);
+
+                    BufferedWriter bufferedWriter = new BufferedWriter(bat);
+                    bufferedWriter.write("@echo off");
+                    bufferedWriter.newLine();
+                    bufferedWriter.write("@cls");
+                    bufferedWriter.newLine();
+                    bufferedWriter.write("@color 17");
+                    bufferedWriter.newLine();
+                    bufferedWriter.write("@title Ping  " + hostName + "  [" + ipAddress + "]");
+                    bufferedWriter.newLine();
+                    bufferedWriter.write(pingCommand);
+                    bufferedWriter.newLine();
+                    bufferedWriter.write("@pause");
+                    bufferedWriter.close();
+                    bat.close();
+
+                    ProcessBuilder processBuilder = new ProcessBuilder("rundll32", "SHELL32.DLL,ShellExec_RunDLL", batFileName);
+                    processBuilder.start();
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @FXML
@@ -169,7 +174,7 @@ public class PingController {
             Scene scene2 = new Scene(page);
 
             Stage advancedFilterDialogStage = new Stage();
-            advancedFilterDialogStage.setTitle("Mostrar linhas que:");
+            advancedFilterDialogStage.setTitle("Show lines that:");
             advancedFilterDialogStage.initModality(Modality.WINDOW_MODAL);
             advancedFilterDialogStage.setScene(scene2);
             AdvancedFilterDialogController ctrl = loader.getController();
@@ -231,7 +236,6 @@ public class PingController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("aboutDialog.fxml"));
             Scene scene = new Scene(loader.load());
 
-            // Cria um novo palco (Stage) para o diálogo
             Stage aboutStage = new Stage();
             aboutStage.setTitle("About PowerPing");
             aboutStage.initModality(Modality.WINDOW_MODAL);
@@ -254,4 +258,3 @@ public class PingController {
         alert.showAndWait();
     }
 }
-

@@ -65,7 +65,7 @@
                     <Button mnemonicParsing="false" onAction="#clearTextField" style="-fx-background-color: transparent;">
                         <graphic>
                             <ImageView pickOnBounds="true" preserveRatio="true">
-                                <Image url="@../../../images/button_cancel.png"/>
+                                <Image url="@../../../images/button_cancel.png" />
                             </ImageView>
                         </graphic>
                         <padding>
@@ -86,7 +86,7 @@
                 </ToolBar>
             </top>
             <center>
-                <TableView fx:id="hostTableView" editable="true" stylesheets="@MyTheme.css" BorderPane.alignment="CENTER">
+                <TableView fx:id="tableView" editable="true" stylesheets="@MyTheme.css" BorderPane.alignment="CENTER">
                     <columns>
                         <TableColumn fx:id="hostNameTableColumn" prefWidth="166.3999908566475" text="Host Name" />
                         <TableColumn fx:id="ipAddressTableColumn" prefWidth="168.00001525878906" text="IP Address" />
