@@ -25,8 +25,10 @@ import java.io.*;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 
 public class PingController {
+    private static final Logger LOGGER = Logger.getLogger(PingController.class.getName());
     private static final String PING_N = "@ping -n 10 ";
     private static final String PING_T = "@ping -t ";
     private final ObservableList<RowData> rowDataList = FXCollections.observableArrayList();
@@ -63,15 +65,12 @@ public class PingController {
         try {
             FileInputStream file = new FileInputStream("devices.xlsx");
             Workbook workbook = WorkbookFactory.create(file);
-            Sheet sheet = workbook.getSheetAt(0); // Assumindo que os dados estão na primeira planilha
-
+            Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
             rowIterator.next();
 
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
-
-                // Lendo os dados da planilha e adicionando à lista
                 String col1Value = row.getCell(0).getStringCellValue();
                 String col2Value = row.getCell(1).getStringCellValue();
                 String col3Value = row.getCell(2).getStringCellValue();
@@ -121,42 +120,48 @@ public class PingController {
     }
 
     @FXML
-    private void runPing() {
-        if (tableView.getSelectionModel().getSelectedIndex() >= 0) {
-            ObservableList<RowData> data = tableView.getSelectionModel().getSelectedItems();
-            try {
-                for (RowData rowData : data) {
-                    String hostName = rowData.getHostName();
-                    String pingCommand = (tCheckBox.isSelected() ? PING_T : PING_N) + rowData.getIpAddress();
-                    String ipAddress = rowData.getIpAddress();
-                    int lineNumber = data.indexOf(rowData);
+    private void pingSelectedHost() {
+        ObservableList<RowData> selectedRowData = tableView.getSelectionModel().getSelectedItems();
 
-                    String env_temp = System.getenv("TEMP");
-                    String batFileName = env_temp + "/powerping/ping" + lineNumber + ".bat";
-                    FileWriter bat = new FileWriter(batFileName);
-
-                    BufferedWriter bufferedWriter = new BufferedWriter(bat);
-                    bufferedWriter.write("@echo off");
-                    bufferedWriter.newLine();
-                    bufferedWriter.write("@cls");
-                    bufferedWriter.newLine();
-                    bufferedWriter.write("@color 17");
-                    bufferedWriter.newLine();
-                    bufferedWriter.write("@title Ping  " + hostName + "  [" + ipAddress + "]");
-                    bufferedWriter.newLine();
-                    bufferedWriter.write(pingCommand);
-                    bufferedWriter.newLine();
-                    bufferedWriter.write("@pause");
-                    bufferedWriter.close();
-                    bat.close();
-
-                    ProcessBuilder processBuilder = new ProcessBuilder("rundll32", "SHELL32.DLL,ShellExec_RunDLL", batFileName);
-                    processBuilder.start();
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        if (!selectedRowData.isEmpty()) {
+            selectedRowData.forEach(this::processRowData);
         }
+    }
+
+    private void processRowData(RowData rowData) {
+        String hostName = rowData.getHostName();
+        String ipAddress = rowData.getIpAddress();
+        int lineNumber = tableView.getSelectionModel().getSelectedItems().indexOf(rowData);
+        String pingCommand = (tCheckBox.isSelected() ? PING_T : PING_N) + ipAddress;
+
+        try {
+            String batFileName = createBatchFile(hostName, ipAddress, lineNumber, pingCommand);
+            executeBatchFile(batFileName);
+        } catch (IOException e) {
+            LOGGER.severe("Error processing row data: " + e.getMessage());
+        }
+    }
+
+    private String createBatchFile(String hostName, String ipAddress, int lineNumber, String pingCommand) throws IOException {
+        String tempDir = System.getenv("TEMP");
+        if (tempDir == null) {
+            throw new IllegalStateException("TEMP directory not found");
+        }
+
+        String batFileName = tempDir + "/powerping/ping" + lineNumber + ".bat";
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(batFileName))) {
+            bufferedWriter.write("@echo off\n");
+            bufferedWriter.write("@cls\n");
+            bufferedWriter.write("@color 17\n");
+            bufferedWriter.write("@title Ping  " + hostName + "  [" + ipAddress + "]\n");
+            bufferedWriter.write(pingCommand + "\n");
+            bufferedWriter.write("@pause\n");
+        }
+        return batFileName;
+    }
+
+    private void executeBatchFile(String batFileName) throws IOException {
+        new ProcessBuilder("rundll32", "SHELL32.DLL,ShellExec_RunDLL", batFileName).start();
     }
 
     @FXML
@@ -166,18 +171,18 @@ public class PingController {
     }
 
     @FXML
-    private void showAdvancedFilterDialog() {
+    private void showSearchMoreOptionsDialog() {
         try {
             searchTextField.clear();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("advancedFilterDialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("searchMoreOptionsDialog.fxml"));
             AnchorPane page = loader.load();
-            Scene scene2 = new Scene(page);
+            Scene scene = new Scene(page);
 
             Stage advancedFilterDialogStage = new Stage();
             advancedFilterDialogStage.setTitle("Show lines that:");
             advancedFilterDialogStage.initModality(Modality.WINDOW_MODAL);
-            advancedFilterDialogStage.setScene(scene2);
-            AdvancedFilterDialogController ctrl = loader.getController();
+            advancedFilterDialogStage.setScene(scene);
+            SearchMoreOptionsDialogController ctrl = loader.getController();
             ctrl.setAdvancedFilterDialogStage(advancedFilterDialogStage);
             advancedFilterDialogStage.setResizable(false);
             advancedFilterDialogStage.showAndWait();
