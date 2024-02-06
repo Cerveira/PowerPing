@@ -4,15 +4,12 @@ import com.nuapps.powerping.model.RowData;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -32,8 +29,9 @@ public class PingController {
     private static final String PING_N = "@ping -n 10 ";
     private static final String PING_T = "@ping -t ";
     private final ObservableList<RowData> rowDataList = FXCollections.observableArrayList();
+    private FilteredList<RowData> filteredData;
     @FXML
-    private TableView<RowData> tableView;
+    private TableView<RowData> tableView = new TableView<>();
     @FXML
     private TableColumn<RowData, String> hostNameTableColumn;
     @FXML
@@ -44,15 +42,12 @@ public class PingController {
     private CheckBox tCheckBox;
     @FXML
     private TextField searchTextField;
-    private FilteredList<RowData> filteredData;
 
     @FXML
     private void initialize() {
         setupTableColumns();
         loadExcelData();
-        setupFiltering();
-        setupCellFactories();
-        setupListeners();
+        setupSearchFilter(); // Adicione esta chamada de método
     }
 
     private void setupTableColumns() {
@@ -75,44 +70,42 @@ public class PingController {
                 String col2Value = row.getCell(1).getStringCellValue();
                 String col3Value = row.getCell(2).getStringCellValue();
                 rowDataList.add(new RowData(col1Value, col2Value, col3Value));
-                tableView.setItems(rowDataList);
-                tableView.getSelectionModel().selectFirst();
-                tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
             }
+            tableView.setItems(rowDataList);
+            tableView.getSelectionModel().selectFirst();
+            tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            workbook.close();
             file.close();
+
+            // Modificação para utilizar FilteredList
+            filteredData = new FilteredList<>(rowDataList, p -> true); // Inicializa o FilteredList
+            tableView.setItems(filteredData); // Define o FilteredList como itens da TableView
         } catch (FileNotFoundException e) {
-            showErrorDialog("File not found", Path.of("devices.xlsx") + " does not exist");
+            showErrorDialog("Error loading data", Path.of("devices.xlsx") + " does not exist");
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void setupFiltering() {
-        filteredData = new FilteredList<>(rowDataList, b -> true);
-        searchTextField.textProperty().addListener((observable, oldValue, newValue) -> filteredData.setPredicate(host -> {
+    private void setupSearchFilter() {
+        searchTextField.textProperty().addListener((observable, oldValue, newValue) -> filteredData.setPredicate(rowData -> {
+            // Se o texto do filtro estiver vazio, mostra todos os dados.
             if (newValue == null || newValue.isEmpty()) {
                 return true;
             }
+
+            // Compara o nome do host, endereço IP e localização de cada rowData com o texto do filtro.
             String lowerCaseFilter = newValue.toLowerCase();
-            return host.getHostName().toLowerCase().contains(lowerCaseFilter)
-                    || host.getIpAddress().toLowerCase().contains(lowerCaseFilter)
-                    || host.getLocation().toLowerCase().contains(lowerCaseFilter);
+
+            if (rowData.getHostName().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filtro corresponde ao nome do host.
+            } else if (rowData.getIpAddress().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filtro corresponde ao endereço IP.
+            } else
+                return rowData.getLocation().toLowerCase().contains(lowerCaseFilter); // Filtro corresponde à localização.
+// Não corresponde.
         }));
-    }
-
-    private void setupCellFactories() {
-        hostNameTableColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        hostNameTableColumn.setOnEditCommit(t -> t.getTableView().getItems().get(t.getTablePosition().getRow()).setHostName(t.getNewValue()));
-        ipAddressTableColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        ipAddressTableColumn.setOnEditCommit(t -> t.getTableView().getItems().get(t.getTablePosition().getRow()).setIpAddress(t.getNewValue()));
-    }
-
-    private void setupListeners() {
-        filteredData.addListener((ListChangeListener<RowData>) change -> {
-            SortedList<RowData> sortedData = new SortedList<>(filteredData);
-            sortedData.comparatorProperty().bind(tableView.comparatorProperty());
-            tableView.setItems(sortedData);
-        });
     }
 
     public void doExit() {
@@ -257,6 +250,7 @@ public class PingController {
 
     private void showErrorDialog(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        //alert.setTitle("File not found");
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);

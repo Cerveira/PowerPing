@@ -7,5 +7,5 @@ module com.nuapps.powerping {
 
     opens com.nuapps.powerping to javafx.fxml;
     exports com.nuapps.powerping;
-    exports com.nuapps.powerping.model;
+//    exports com.nuapps.powerping.model;
 }
