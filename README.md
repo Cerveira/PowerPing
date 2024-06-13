@@ -1,5 +1,5 @@
 # PowerPing 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/Cerveira/Power-Ping/blob/master/LICENSE)
 
 ## Descrição
 O PowerPing é um aplicativo desktop escrito em Java/JavaFX que oferece uma maneira fácil e intuitiva de realizar testes de "ping" (ICMP) em hosts selecionados. Com uma interface gráfica amigável, o PowerPing simplifica o processo de monitoramento da conectividade de dispositivos em uma rede.
